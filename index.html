@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paylance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <span class="app-logo">
+      <img src="icons/logo.svg" alt="Paylance logo" width="32" height="32" class="logo-img" />
+      Paylance
+    </span>
+    <button id="themeToggle" class="btn-icon" aria-label="Toggle dark/light mode">
+      <img id="themeIcon" src="icons/moon.svg" alt="Toggle theme" width="20" height="20" />
+    </button>
+  </header>
+
+  <main class="container">
+
+    <!-- Balance Card -->
+    <section class="balance-card" aria-label="Total balance">
+      <p class="balance-label">Total Balance</p>
+      <h2 class="balance-amount" id="totalBalance">€0.00</h2>
+      <p class="balance-sub" id="spendingWarning" hidden>
+        Spending limit exceeded
+      </p>
+    </section>
+
+    <!-- Spending Limit -->
+    <section class="card limit-section">
+      <p class="section-title">Spending Limit (€)</p>
+      <div class="limit-row">
+        <input type="number" id="spendingLimit" placeholder="e.g. 500" min="0" />
+        <button id="setLimitBtn" class="btn btn-secondary">Set Limit</button>
+      </div>
+      <p class="limit-display" id="limitDisplay"></p>
+    </section>
+
+    <!-- Add Transaction Form -->
+    <section class="card form-section">
+      <h2 class="section-title">New Transaction</h2>
+      <form id="transactionForm" novalidate>
+        <div class="form-group">
+          <label for="itemName">Item Name</label>
+          <input type="text" id="itemName" placeholder="e.g. Lunch" maxlength="60" />
+          <span class="error-msg" id="nameError"></span>
+        </div>
+        <div class="form-group">
+          <label for="amount">Amount (€)</label>
+          <input type="number" id="amount" placeholder="e.g. 25.00" min="0.01" step="0.01" />
+          <span class="error-msg" id="amountError"></span>
+        </div>
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select id="category">
+            <option value="">Select a category</option>
+            <option value="Food">Food</option>
+            <option value="Fun">Fun</option>
+            <option value="Gadget">Gadget</option>
+            <option value="Medicine">Medicine</option>
+            <option value="Outfit">Outfit</option>
+            <option value="Skincare">Skincare</option>
+            <option value="Subscription">Subscription</option>
+            <option value="Supplies">Supplies</option>
+            <option value="Tools">Tools</option>
+            <option value="Transport">Transport</option>
+            <option value="Other">Other</option>
+          </select>
+          <span class="error-msg" id="categoryError"></span>
+        </div>
+        <div class="form-group" id="otherGroup" hidden>
+          <label for="otherDesc">Activity Description</label>
+          <input type="text" id="otherDesc" placeholder="e.g. Haircut, Medicine..." maxlength="60" />
+          <span class="error-msg" id="otherError"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Transaction</button>
+      </form>
+    </section>
+
+    <!-- Chart -->
+    <section class="card chart-section">
+      <h2 class="section-title">Spending by Category</h2>
+      <div class="chart-wrapper">
+        <canvas id="spendingChart" aria-label="Pie chart of spending by category" role="img"></canvas>
+        <p class="chart-empty" id="chartEmpty">No data yet. Add a transaction to get started.</p>
+      </div>
+    </section>
+
+    <!-- Transaction List -->
+    <section class="card list-section">
+      <div class="list-header">
+        <h2 class="section-title">Transactions</h2>
+        <div class="sort-controls">
+          <label for="sortBy" class="sr-only">Sort by</label>
+          <select id="sortBy" aria-label="Sort transactions">
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="amount-desc">Amount: High to Low</option>
+            <option value="amount-asc">Amount: Low to High</option>
+            <option value="category-asc">Category: A to Z</option>
+          </select>
+        </div>
+      </div>
+      <ul class="transaction-list" id="transactionList" aria-label="Transaction list">
+        <li class="empty-state" id="emptyState">No transactions yet.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <script src="js/app.js"></script>
+
+  <!-- Spending Limit Warning Modal -->
+  <div id="limitModal" class="modal-overlay" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h2 class="modal-title" id="modalTitle">Spending Limit Exceeded</h2>
+      <p class="modal-body">You've already gone over your spending limit. Adding this transaction will increase your total even further. Are you sure you want to continue?</p>
+      <div class="modal-actions">
+        <button id="modalDismiss" class="btn btn-modal-dismiss">I get it</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
